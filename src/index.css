@@ -1,0 +1,67 @@
+:root,
+[data-theme="dark"] {
+  --bg: #0c0d0a;
+  --card: #171913;
+  --card-2: #1f2218;
+  --line: #2a2e21;
+  --text: #f3f53c;
+  --muted: #a8ad9a;
+  --accent: #c8f135;
+  --accent-ink: #0c0d0a;
+  --accent-text: #c8f135;
+  --scrim: rgba(12, 13, 10, 0.6);
+  color-scheme: dark;
+}
+[data-theme="light"] {
+  --bg: #f4f5ee;
+  --card: #ffffff;
+  --card-2: #eceee2;
+  --line: #dadccb;
+  --text: #11130c;
+  --muted: #586046;
+  --accent: #c8f135;
+  --accent-ink: #11130c;
+  --accent-text: #3f6212;
+  --scrim: rgba(244, 245, 238, 0.6);
+  color-scheme: light;
+}
+
+:root {
+  --font-body: "Inter", system-ui, sans-serif;
+  --font-heading: "Barlow Condensed", sans-serif;
+  --font-brand: "Space Grotesk", sans-serif;
+}
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+}
+
+button {
+  font-family: inherit;
+}
+
+.page-eyebrow {
+  margin: 0 0 8px;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent-text);
+}
+
+.page-title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: clamp(48px, 8vw, 76px);
+  line-height: 0.95;
+  text-transform: uppercase;
+}
