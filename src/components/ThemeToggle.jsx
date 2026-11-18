@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { KEYS, saveString } from "../storage.js";
 import "./ThemeToggle.css";
 
 export default function ThemeToggle() {
@@ -9,11 +10,7 @@ export default function ThemeToggle() {
   function toggle() {
     const next = theme === "dark" ? "light" : "dark";
     document.documentElement.dataset.theme = next;
-    try {
-      localStorage.setItem("prchive-theme", next);
-    } catch {
-      //cant access storage - theme still switches but not remembered
-    }
+    saveString(KEYS.theme, next);
     setTheme(next);
   }
   return (
