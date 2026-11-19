@@ -1,9 +1,19 @@
 import { Link } from "react-router";
 import { DAY_LABELS } from "../data/split";
 
-export default function DayCard({ day, name, count, isToday }) {
+export default function DayCard({ day, name, count, isToday, isOpen }) {
+  const classes = ["day-card"];
+  if (isToday) classes.push("day-card--today");
+  if (isOpen) classes.push("day-card--open");
+
   return (
-    <div className={`day-card${isToday ? " day-card--today" : ""}`}>
+    <Link
+      to={isOpen ? "/split" : `/split/${day}`}
+      viewTransition
+      className={classes.join(" ")}
+      style={{ viewTransitionName: `day-${day}` }}
+      aria-label={`${isOpen ? "Close" : "Open"} ${DAY_LABELS[day]}`}
+    >
       <div className="day-card__top">
         <span className="day-card__day">{day}</span>
         {isToday && <span className="day-card__badge">Today</span>}
@@ -15,14 +25,8 @@ export default function DayCard({ day, name, count, isToday }) {
             ? "Rest day"
             : `${count} ${count === 1 ? "exercise" : "exercises"}`}
         </p>
-        <Link
-          to={`/split/${day}`}
-          className="day-card__arrow"
-          aria-label={`Open ${DAY_LABELS[day]}`}
-        >
-          →
-        </Link>
+        <span className="day-card__arrow">→</span>
       </div>
-    </div>
+    </Link>
   );
 }

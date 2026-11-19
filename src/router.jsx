@@ -5,6 +5,7 @@ import Log from "./pages/Log";
 import Progress from "./pages/Progress";
 import Subscription from "./pages/Subscription";
 import NotFound from "./pages/NotFound";
+import DayDetails from "./components/DayDetails";
 
 export const router = createBrowserRouter([
   {
@@ -12,7 +13,11 @@ export const router = createBrowserRouter([
     Component: AppLayout,
     children: [
       { index: true, element: <Navigate to="/split" replace /> },
-      { path: "split", Component: Split },
+      {
+        path: "split",
+        Component: Split,
+        children: [{ path: ":day", Component: DayDetails }],
+      },
       { path: "log", Component: Log },
       { path: "progress", Component: Progress },
       { path: "subscription", Component: Subscription },

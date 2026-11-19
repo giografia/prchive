@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useReducer, useEffect } from "react";
 import { AppDataContext } from "./AppDataContext";
 import { loadSplit, saveSplit } from "../data/split.js";
 import {
@@ -7,49 +7,112 @@ import {
   loadUnit,
   saveUnit,
 } from "../data/sessions.js";
+import { loadExercises, saveExecises } from "../data/exercises.js";
+
+function init() {
+  return {
+    exercises: loadExercises(),
+    split: loadSplit(),
+    sessions: loadSessions(),
+    unit: loadUnit(),
+  };
+}
+function reducer(state, action) {
+  switch (action.type) {
+    case "exercise/added":
+      return { ...state, exercises: [...state.exercises, action.exercise] };
+
+    case "day/renamed":
+      return {
+        ...state,
+        split: {
+          ...state.split,
+          [action.day]: { ...state.split[action.day], name: action.name },
+        },
+      };
+
+    case "day/exerciseAdded": {
+      const current = state.split[action.day];
+      if (current.exerciseIds.includes(action.exerciseId)) return state;
+      return {
+        ...state,
+        split: {
+          ...state.split,
+          [action.day]: {
+            ...current,
+            exerciseIds: [...current.exerciseIds, action.exerciseId],
+          },
+        },
+      };
+    }
+
+    case "day/exerciseRemoved": {
+      const current = state.split[action.day];
+      return {
+        ...state,
+        split: {
+          ...state.split,
+          [action.day]: {
+            ...current,
+            exerciseIds: current.exerciseIds.filter(
+              (id) => id !== action.exerciseId,
+            ),
+          },
+        },
+      };
+    }
+
+    case "session/added":
+      return { ...state, sessions: [...state.sessions, action.session] };
+
+    case "unit/set":
+      return { ...state, unit: action.unit };
+
+    default:
+      return state;
+  }
+}
 
 export default function AppDataProvider({ children }) {
-  const [split, setSplit] = useState(loadSplit);
-  const [sessions, setSessions] = useState(loadSessions);
-  const [unit, setUnit] = useState(loadUnit);
+  const [state, dispatch] = useReducer(reducer, undefined, init);
 
   useEffect(() => {
-    saveSplit(split);
-  }, [split]);
+    saveExecises(state.exercises);
+  }, [state.exercises]);
   useEffect(() => {
-    saveSessions(sessions);
-  }, [sessions]);
+    saveSplit(state.split);
+  }, [state.split]);
   useEffect(() => {
-    saveUnit(unit);
-  }, [unit]);
+    saveSessions(state.sessions);
+  }, [state.sessions]);
+  useEffect(() => {
+    saveUnit(state.unit);
+  }, [state.unit]);
 
-  function addExercise(day, name) {
+  function addExercise(name) {
     const exercise = { id: crypto.randomUUID(), name: name.trim() };
-    setSplit((prev) => ({
-      ...prev,
-      [day]: { ...prev[day], exercises: [...prev[day].exercises, exercise] },
-    }));
-  }
-
-  function removeExercise(day, id) {
-    setSplit((prev) => ({
-      ...prev,
-      [day]: {
-        ...prev[day],
-        exercises: prev[day].exercises.filter((ex) => ex.id !== id),
-      },
-    }));
+    dispatch({ type: "exercise/added", exercise });
+    return exercise;
   }
   function addSession(session) {
-    setSessions((prev) => [...prev, { id: crypto.randomUUID(), ...session }]);
+    dispatch({
+      type: "session/added",
+      session: { id: crypto.randomUUID(), ...session },
+    });
   }
+
   const value = {
-    split,
-    sessions,
-    unit,
-    setUnit,
+    exercises: state.exercises,
+    split: state.split,
+    sessions: state.sessions,
+    unit: state.unit,
+    setUnit: (unit) => dispatch({ type: "unit/set", unit }),
     addExercise,
-    removeExercise,
+    renameDay: (day, name) => dispatch({ type: "day/renamed", day, name }),
+    addExerciseToDay: (day, exerciseId) =>
+      dispatch({ type: "day/exerciseAdded", day, exerciseId }),
+    removeExerciseFromDay: (day, exerciseId) =>
+      dispatch({ type: "day/exerciseRemoved", day, exerciseId }),
     addSession,
   };
 

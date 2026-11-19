@@ -20,8 +20,10 @@ export function getTodayKey() {
 
 // Shape: { mon: { name: "Push", exercises: [{ id, name }] }, ... }
 function normalizeDay(value) {
-  if (Array.isArray(value)) return { name: "Rest", exercises: value }; // older saved format
-  return { name: value?.name || "Rest", exercises: value?.exercises || [] };
+  return {
+    name: value?.name || "Rest",
+    exerciseIds: Array.isArray(value?.exerciseIds) ? value.exerciseIds : [],
+  };
 }
 
 export function loadSplit() {

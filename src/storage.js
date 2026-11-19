@@ -3,6 +3,7 @@ export const KEYS = {
   split: "prchive-split",
   sessions: "prchive-sessions",
   unit: "prchive-unit",
+  exercises: "prchive-exercises",
 };
 
 export function load(key, fallback = null) {

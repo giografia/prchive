@@ -6,11 +6,12 @@ const KG_PER_LB = 0.45359237;
 // {
 //   id,
 //   date: "2026-11-18",          // YYYY-MM-DD
-//   day: "wed",                  // which split day it was
+//   weekday: "wed",
 //   entries: [
-//     { exerciseId, name, sets: [{ reps: 8, weightKg: 60 }, ...] },
+//     { exerciseId: "bench", sets: [{ kg: 77.5, reps: 8 }, ...] },
 //   ],
 // }
+// Weights are always stored in kg.
 
 export function loadSessions() {
   return load(KEYS.sessions, []);
