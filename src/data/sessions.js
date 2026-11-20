@@ -38,3 +38,21 @@ export function kgToDisplay(kg, unit) {
 export function displayToKg(value, unit) {
   return unit === "lb" ? value * KG_PER_LB : value;
 }
+
+export function todayISO() {
+  const d = new Date();
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  return `${d.getFullYear()}-${mm}-${dd}`;
+}
+
+export function getPreviousSets(sessions, exerciseId) {
+  let latest = null;
+  for (const s of sessions) {
+    const entry = s.entries.find((e) => e.exerciseId === exerciseId);
+    if (entry && (!latest || s.date >= latest.date)) {
+      latest = { date: s.date, sets: entry.sets };
+    }
+  }
+  return latest ? latest.sets : [];
+}

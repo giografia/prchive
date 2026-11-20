@@ -1,0 +1,101 @@
+.log-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(400px, 100%), 1fr));
+  align-items: start;
+  gap: 16px;
+}
+
+.log-form__empty {
+  color: var(--muted);
+}
+
+.log-form__empty a {
+  color: var(--accent-text);
+}
+
+.log-form__exercise {
+  padding: 20px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+}
+
+.log-form__name {
+  margin: 0 0 16px;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 28px;
+  text-transform: uppercase;
+}
+
+.log-form__row {
+  display: grid;
+  grid-template-columns: 40px 1fr 1fr 1fr;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.log-form__row--head {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.log-form__num {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--muted);
+}
+
+.log-form__prev {
+  color: var(--muted);
+}
+
+.log-form__row input {
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--card-2);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: var(--text);
+  font: inherit;
+}
+
+.log-form__row input:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.log-form__add {
+  margin-top: 4px;
+  padding: 8px 14px;
+  background: none;
+  border: 1px dashed var(--line);
+  border-radius: 10px;
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.log-form__finish {
+  grid-column: 1 / -1;
+  justify-self: start;
+  padding: 14px 20px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font: inherit;
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.log-form__finish:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

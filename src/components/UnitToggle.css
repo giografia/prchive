@@ -1,0 +1,23 @@
+.unit-toggle {
+  display: inline-flex;
+  padding: 4px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+}
+
+.unit-toggle__btn {
+  padding: 6px 16px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.unit-toggle__btn.active {
+  background: var(--accent);
+  color: var(--accent-ink);
+}

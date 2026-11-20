@@ -16,6 +16,9 @@ export default function AppLayout() {
   const navRef = useRef(null);
   const placedOnce = useRef(false);
   const [pill, setPill] = useState(null);
+  const [splitPath, setSplitPath] = useState("/split");
+  const onSplit = pathname === "/split" || pathname.startsWith("/split/");
+  if (onSplit && pathname !== splitPath) setSplitPath(pathname);
 
   useLayoutEffect(() => {
     function place() {
@@ -62,17 +65,21 @@ export default function AppLayout() {
                 : { opacity: 0 }
             }
           />
-          {tabs.map((tab) => (
-            <NavLink
-              key={tab.to}
-              to={tab.to}
-              className={({ isActive }) =>
-                "nav-tab" + (isActive ? " active" : "")
-              }
-            >
-              {tab.label}
-            </NavLink>
-          ))}
+          {tabs.map((tab) => {
+            const isSplitTab = tab.to === "/split";
+            return (
+              <NavLink
+                key={tab.to}
+                to={isSplitTab ? splitPath : tab.to}
+                className={({ isActive }) =>
+                  "nav-tab" +
+                  ((isSplitTab ? onSplit : isActive) ? " active" : "")
+                }
+              >
+                {tab.label}
+              </NavLink>
+            );
+          })}
         </nav>
         <ThemeToggle />
       </header>
