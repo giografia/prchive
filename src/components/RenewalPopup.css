@@ -1,0 +1,133 @@
+.renewal-popup__overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: var(--scrim);
+  backdrop-filter: blur(6px);
+  animation: renewal-fade 0.25s ease;
+}
+
+.renewal-popup {
+  width: min(440px, 100%);
+  padding: 28px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  animation: renewal-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.renewal-popup--soon {
+  border-color: var(--accent-text);
+}
+
+.renewal-popup--urgent {
+  border-color: var(--accent-text);
+  box-shadow:
+    0 0 0 1px var(--accent-text),
+    0 16px 48px var(--glow);
+}
+
+.renewal-popup__eyebrow {
+  margin: 0;
+  color: var(--accent-text);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.renewal-popup__title {
+  margin: 8px 0 12px;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 44px;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.renewal-popup__body {
+  margin: 0 0 24px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.renewal-popup__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.renewal-popup__primary {
+  padding: 12px 22px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    filter 0.18s ease;
+}
+
+@media (hover: hover) {
+  .renewal-popup__primary:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.06);
+    box-shadow: 0 6px 20px var(--glow);
+  }
+}
+
+.renewal-popup__primary:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+.renewal-popup__secondary {
+  color: var(--accent-text);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.renewal-popup__secondary:hover {
+  text-decoration: underline;
+}
+
+@keyframes renewal-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes renewal-pop {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .renewal-popup__overlay,
+  .renewal-popup {
+    animation: none;
+  }
+  .renewal-popup__primary {
+    transition: none;
+  }
+  .renewal-popup__primary:hover {
+    transform: none;
+  }
+}

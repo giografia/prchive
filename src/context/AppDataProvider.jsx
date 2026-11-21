@@ -8,6 +8,7 @@ import {
   saveUnit,
 } from "../data/sessions.js";
 import { loadExercises, saveExecises } from "../data/exercises.js";
+import { loadSubscription, saveSubscription } from "../data/subscription.js";
 
 function init() {
   return {
@@ -15,6 +16,7 @@ function init() {
     split: loadSplit(),
     sessions: loadSessions(),
     unit: loadUnit(),
+    subscription: loadSubscription(),
   };
 }
 function reducer(state, action) {
@@ -68,6 +70,26 @@ function reducer(state, action) {
     case "unit/set":
       return { ...state, unit: action.unit };
 
+    case "subscription/dateSet":
+      return {
+        ...state,
+        subscription: { ...state.subscription, renewalDate: action.date },
+      };
+
+    case "subscription/reminderToggled": {
+      const current = state.subscription.remindDaysBefore;
+      const next = current.includes(action.days)
+        ? current.filter((d) => d !== action.days)
+        : [...current, action.days];
+      return {
+        ...state,
+        subscription: {
+          ...state.subscription,
+          remindDaysBefore: next.sort((a, b) => b - a),
+        },
+      };
+    }
+
     default:
       return state;
   }
@@ -88,6 +110,9 @@ export default function AppDataProvider({ children }) {
   useEffect(() => {
     saveUnit(state.unit);
   }, [state.unit]);
+  useEffect(() => {
+    saveSubscription(state.subscription);
+  }, [state.subscription]);
 
   function addExercise(name) {
     const exercise = { id: crypto.randomUUID(), name: name.trim() };
@@ -114,6 +139,10 @@ export default function AppDataProvider({ children }) {
     removeExerciseFromDay: (day, exerciseId) =>
       dispatch({ type: "day/exerciseRemoved", day, exerciseId }),
     addSession,
+    subscription: state.subscription,
+    setRenewalDate: (date) => dispatch({ type: "subscription/dateSet", date }),
+    toggleReminder: (days) =>
+      dispatch({ type: "subscription/reminderToggled", days }),
   };
 
   return (

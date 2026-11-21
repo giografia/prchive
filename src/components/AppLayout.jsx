@@ -1,5 +1,8 @@
 import { Link, NavLink, Outlet, useLocation } from "react-router";
 import { useLayoutEffect, useRef, useState } from "react";
+import { useAppData } from "../context/useAppData";
+import { getReminder } from "../data/subscription";
+import RenewalPopup from "./RenewalPopup";
 import Logo from "./Logo";
 import ThemeToggle from "./ThemeToggle";
 import "./AppLayout.css";
@@ -19,6 +22,9 @@ export default function AppLayout() {
   const [splitPath, setSplitPath] = useState("/split");
   const onSplit = pathname === "/split" || pathname.startsWith("/split/");
   if (onSplit && pathname !== splitPath) setSplitPath(pathname);
+  const { subscription } = useAppData();
+  const reminder = getReminder(subscription);
+  const [popupOpen, setPopupOpen] = useState(() => reminder !== null);
 
   useLayoutEffect(() => {
     function place() {
@@ -86,6 +92,13 @@ export default function AppLayout() {
       <main className="app-main">
         <Outlet />
       </main>
+      {popupOpen && reminder && (
+        <RenewalPopup
+          reminder={reminder}
+          date={subscription.renewalDate}
+          onClose={() => setPopupOpen(false)}
+        />
+      )}
     </>
   );
 }

@@ -4,6 +4,7 @@ export const KEYS = {
   sessions: "prchive-sessions",
   unit: "prchive-unit",
   exercises: "prchive-exercises",
+  subscription: "prchive-subscription",
 };
 
 export function load(key, fallback = null) {
