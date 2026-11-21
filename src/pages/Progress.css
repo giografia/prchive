@@ -1,0 +1,73 @@
+.progress__header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.progress__empty,
+.progress__hint {
+  color: var(--muted);
+}
+
+.progress__empty a {
+  color: var(--accent-text);
+}
+
+.progress__picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 24px 0;
+}
+
+.progress__chip {
+  padding: 10px 16px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--text);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.progress__chip.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+
+.progress__stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.progress__chip {
+  transition:
+    transform 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+@media (hover: hover) {
+  .progress__chip:not(.active):hover {
+    transform: translateY(-2px);
+    border-color: var(--accent);
+    color: var(--accent-text);
+    box-shadow: 0 6px 20px rgba(200, 241, 53, 0.18);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .progress__chip {
+    transition: none;
+  }
+  .progress__chip:not(.active):hover {
+    border-color: var(--accent-text);
+    color: var(--accent-text);
+    box-shadow: 0 6px 20px var(--glow);
+  }
+}

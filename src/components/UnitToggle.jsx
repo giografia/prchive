@@ -4,7 +4,12 @@ import "./UnitToggle.css";
 export default function UnitToggle() {
   const { unit, setUnit } = useAppData();
   return (
-    <div className="unit-toggle" role="group" aria-label="Weight unit">
+    <div
+      className="unit-toggle"
+      data-unit={unit}
+      role="group"
+      aria-label="Weight unit"
+    >
       {["kg", "lb"].map((u) => (
         <button
           key={u}

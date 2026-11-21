@@ -20,6 +20,7 @@ export const router = createBrowserRouter([
       },
       { path: "log", Component: Log },
       { path: "progress", Component: Progress },
+      { path: "progress/:exerciseId", Component: Progress },
       { path: "subscription", Component: Subscription },
       { path: "*", Component: NotFound },
     ],

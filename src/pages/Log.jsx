@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import LogForm from "../components/LogForm";
 import UnitToggle from "../components/UnitToggle";
 import { useAppData } from "../context/useAppData";
@@ -10,6 +10,28 @@ export default function Log() {
   const today = getTodayKey();
   const [day, setDay] = useState(today);
   const [justSaved, setJustSaved] = useState(false);
+  const daysRef = useRef(null);
+  const placedOnce = useRef(false);
+  const [pill, setPill] = useState(null);
+
+  useLayoutEffect(() => {
+    function place() {
+      const active = daysRef.current?.querySelector(".log__day.active");
+      if (!active) return;
+      setPill({
+        x: active.offsetLeft,
+        y: active.offsetTop,
+        w: active.offsetWidth,
+        h: active.offsetHeight,
+        animate: placedOnce.current,
+      });
+      placedOnce.current = true;
+    }
+    place();
+    window.addEventListener("resize", place);
+    document.fonts?.ready.then(place);
+    return () => window.removeEventListener("resize", place);
+  }, [day]);
 
   return (
     <section className="log">
@@ -21,7 +43,25 @@ export default function Log() {
         <UnitToggle />
       </header>
 
-      <div className="log__days" role="group" aria-label="Choose day">
+      <div
+        className="log__days"
+        role="group"
+        aria-label="Choose day"
+        ref={daysRef}
+      >
+        <span
+          className={"log__pill" + (pill?.animate ? " animate" : "")}
+          aria-hidden="true"
+          style={
+            pill
+              ? {
+                  width: pill.w,
+                  height: pill.h,
+                  transform: `translate(${pill.x}px, ${pill.y}px)`,
+                }
+              : { opacity: 0 }
+          }
+        />
         {DAYS.map((d) => (
           <button
             key={d}

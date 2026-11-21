@@ -10,6 +10,7 @@
   --accent-ink: #0c0d0a;
   --accent-text: #c8f135;
   --scrim: rgba(12, 13, 10, 0.6);
+  --glow: rgba(200, 241, 53, 0.18);
   color-scheme: dark;
 }
 [data-theme="light"] {
@@ -23,6 +24,7 @@
   --accent-ink: #11130c;
   --accent-text: #3f6212;
   --scrim: rgba(244, 245, 238, 0.6);
+  --glow: rgba(63, 98, 18, 0.22);
   color-scheme: light;
 }
 
@@ -210,6 +212,55 @@ button {
   background: var(--accent);
   border-color: var(--accent);
   color: var(--accent-ink);
+}
+
+.day-card {
+  transition:
+    transform 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    background-color 0.18s ease;
+}
+
+.day-card__arrow {
+  transition:
+    transform 0.18s ease,
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease;
+}
+
+@media (hover: hover) {
+  .day-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--accent-text);
+    box-shadow: 0 10px 28px var(--glow);
+  }
+
+  /* keep today's ring while hovering */
+  .day-card--today:hover {
+    box-shadow:
+      0 0 0 1px var(--accent-text),
+      0 10px 28px var(--glow);
+  }
+
+  .day-card:hover .day-card__arrow {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--accent-ink);
+    transform: translateX(3px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .day-card,
+  .day-card__arrow {
+    transition: none;
+  }
+  .day-card:hover,
+  .day-card:hover .day-card__arrow {
+    transform: none;
+  }
 }
 
 .day-details {

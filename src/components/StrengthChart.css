@@ -1,0 +1,23 @@
+.strength-chart {
+  padding: 20px 12px 12px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+}
+
+.strength-chart__tip {
+  padding: 10px 14px;
+  background: var(--card-2);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: var(--text);
+}
+
+.strength-chart__tip p {
+  margin: 0;
+}
+
+.strength-chart__tip-date {
+  color: var(--muted);
+  font-size: 13px;
+}

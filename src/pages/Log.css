@@ -6,6 +6,7 @@
 }
 
 .log__days {
+  position: relative;
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
@@ -28,9 +29,9 @@
 }
 
 .log__day.active {
-  background: var(--accent);
-  border-color: var(--accent);
   color: var(--accent-ink);
+  border-color: transparent;
+  background: transparent;
 }
 
 .log__today {
@@ -47,4 +48,54 @@
   margin: 0 0 16px;
   color: var(--accent-text);
   font-weight: 600;
+}
+
+.log__pill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 12px;
+  background: var(--accent);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    0 4px 18px color-mix(in srgb, var(--accent) 35%, transparent);
+  pointer-events: none;
+}
+
+.log__pill.animate {
+  transition:
+    transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1),
+    width 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .log__pill.animate {
+    transition: none;
+  }
+}
+
+.log__day {
+  transition:
+    transform 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+@media (hover: hover) {
+  .log__day:not(.active):hover {
+    transform: translateY(-2px);
+    border-color: var(--accent-text);
+    color: var(--accent-text);
+    box-shadow: 0 6px 20px var(--glow);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .log__day {
+    transition: none;
+  }
+  .log__day:not(.active):hover {
+    transform: none;
+  }
 }

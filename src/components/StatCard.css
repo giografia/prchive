@@ -1,0 +1,33 @@
+.stat-card {
+  padding: 20px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+}
+
+.stat-card__label {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.stat-card__value {
+  margin: 8px 0 4px;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 36px;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.stat-card--positive .stat-card__value {
+  color: var(--accent-text);
+}
+
+.stat-card__note {
+  margin: 0;
+  color: var(--muted);
+}
