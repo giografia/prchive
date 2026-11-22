@@ -30,9 +30,9 @@
 
 .log-form__row {
   display: grid;
-  grid-template-columns: 32px 1fr 1fr 1fr 32px;
+  grid-template-columns: 28px minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) 32px;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   margin-bottom: 8px;
 }
 
@@ -55,10 +55,12 @@
 
 .log-form__row--head {
   color: var(--muted);
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.03em;
+  line-height: 1.2;
   text-transform: uppercase;
+  text-align: center;
 }
 
 .log-form__num {
@@ -66,15 +68,20 @@
   font-weight: 700;
   font-size: 18px;
   color: var(--muted);
+  text-align: center;
 }
 
 .log-form__prev {
   color: var(--muted);
+  font-size: 14px;
+  text-align: center;
+  white-space: nowrap;
 }
 
 .log-form__row input {
   width: 100%;
-  padding: 10px 12px;
+  padding: 10px 6px;
+  text-align: center;
   background: var(--card-2);
   border: 1px solid var(--line);
   border-radius: 10px;
