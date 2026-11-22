@@ -70,6 +70,12 @@ export default function LogForm({ day, onFinished }) {
   function addSet(id) {
     setSets((prev) => ({ ...prev, [id]: [...prev[id], emptySet()] }));
   }
+  function removeSet(id, index) {
+    setSets((prev) => ({
+      ...prev,
+      [id]: prev[id].filter((_, i) => i !== index),
+    }));
+  }
   const entries = buildEntries(exerciseIds, sets);
 
   function finish() {
@@ -100,6 +106,7 @@ export default function LogForm({ day, onFinished }) {
               <span>Previous</span>
               <span>Weight ({unit})</span>
               <span>Reps</span>
+              <span />
             </div>
 
             {sets[id].map((set, i) => (
@@ -111,12 +118,14 @@ export default function LogForm({ day, onFinished }) {
                     : "—"}
                 </span>
                 <input
-                  type="number"
+                  type="text"
                   inputMode="decimal"
-                  min="0"
-                  step="any"
+                  autoComplete="off"
                   value={shownWeight(set, unit)}
-                  onChange={(e) => updateSet(id, i, "weight", e.target.value)}
+                  onChange={(e) => {
+                    const v = e.target.value.replace(",", ".");
+                    if (/^\d*\.?\d*$/.test(v)) updateSet(id, i, "weight", v);
+                  }}
                   aria-label={`Set ${i + 1} weight`}
                 />
                 <input
@@ -128,6 +137,18 @@ export default function LogForm({ day, onFinished }) {
                   onChange={(e) => updateSet(id, i, "reps", e.target.value)}
                   aria-label={`Set ${i + 1} reps`}
                 />
+                {sets[id].length > 2 ? (
+                  <button
+                    type="button"
+                    className="log-form__remove"
+                    onClick={() => removeSet(id, i)}
+                    aria-label={`Remove set ${i + 1}`}
+                  >
+                    ✕
+                  </button>
+                ) : (
+                  <span />
+                )}
               </div>
             ))}
 
