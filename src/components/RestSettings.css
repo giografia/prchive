@@ -3,6 +3,7 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  justify-content: space-between;
   gap: 8px 16px;
   padding: 12px 16px;
   background: var(--card);
@@ -12,22 +13,23 @@
 
 .rest-settings__label {
   font-family: var(--font-heading);
-  font-weight: 700;
-  font-size: 18px;
+  font-weight: 800;
+  font-size: 30px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--muted);
+  color: var(--text);
 }
 
 .rest-settings__stepper {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 14px;
 }
 
 .rest-settings__value {
   min-width: 60px;
   text-align: center;
+  color: var(--muted);
   font-family: var(--font-heading);
   font-weight: 800;
   font-size: 26px;
