@@ -4,6 +4,9 @@
   align-items: start;
   gap: 16px;
 }
+.log-form--resting {
+  padding-bottom: 110px;
+}
 
 .log-form__empty {
   color: var(--muted);
@@ -30,7 +33,9 @@
 
 .log-form__row {
   display: grid;
-  grid-template-columns: 28px minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) 32px;
+  grid-template-columns:
+    24px minmax(0, 1.1fr) minmax(0, 1fr) minmax(0, 0.8fr)
+    32px 32px;
   align-items: center;
   gap: 8px;
   margin-bottom: 8px;
@@ -51,6 +56,39 @@
 .log-form__remove:hover {
   border-color: var(--accent-text);
   color: var(--text);
+}
+.log-form__check {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: none;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: var(--muted);
+  font: inherit;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.log-form__check:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.log-form__check--done {
+  background: var(--accent);
+  border-color: transparent;
+  color: var(--accent-ink);
+}
+
+@media (hover: hover) {
+  .log-form__check:hover:not(:disabled):not(.log-form__check--done) {
+    border-color: var(--accent-text);
+    color: var(--accent-text);
+  }
 }
 
 .log-form__row--head {
@@ -167,5 +205,19 @@
 @media (prefers-reduced-motion: reduce) {
   .log-form__finish:hover:not(:disabled) {
     transform: none;
+  }
+}
+/* Phones: the row now has two buttons, so give the numbers more room */
+@media (max-width: 640px) {
+  .log-form__exercise {
+    padding: 16px 12px;
+  }
+
+  .log-form__row {
+    gap: 4px;
+    grid-template-columns: 24px minmax(0, 1.15fr) minmax(0, 1fr) minmax(
+        0,
+        0.85fr
+      ) 32px 32px;
   }
 }
