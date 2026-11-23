@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { Link } from "react-router";
 import { useAppData } from "../context/useAppData";
+import { useRestTimer } from "../hooks/useRestTimer";
+import RestBar from "./RestBar";
+import RestSettings from "./RestSettings";
 import {
   displayToKg,
   getPreviousSets,
@@ -11,7 +14,15 @@ import "./LogForm.css";
 
 const DEFAULT_ROWS = 2;
 
-const emptySet = () => ({ weight: "", reps: "", weightUnit: null });
+const emptySet = () => ({
+  weight: "",
+  reps: "",
+  weightUnit: null,
+  done: false,
+});
+
+const isFilled = (set) =>
+  parseFloat(set.weight) > 0 && parseInt(set.reps, 10) > 0;
 
 function shownWeight(set, unit) {
   if (set.weight === "" || set.weightUnit === unit) return set.weight;
@@ -43,6 +54,7 @@ export default function LogForm({ day, onFinished }) {
   const { split, exercises, sessions, unit, addSession } = useAppData();
   const exerciseIds = split[day].exerciseIds;
   const nameById = Object.fromEntries(exercises.map((ex) => [ex.id, ex.name]));
+  const rest = useRestTimer();
 
   const [sets, setSets] = useState(() =>
     Object.fromEntries(
@@ -76,10 +88,16 @@ export default function LogForm({ day, onFinished }) {
       [id]: prev[id].filter((_, i) => i !== index),
     }));
   }
+  function toggleDone(id, index) {
+    const wasDone = sets[id][index].done;
+    updateSet(id, index, "done", !wasDone);
+    if (!wasDone) rest.start();
+  }
   const entries = buildEntries(exerciseIds, sets);
 
   function finish() {
     if (entries.length === 0) return;
+    rest.skip();
     addSession({ date: todayISO(), weekday: day, entries });
     onFinished();
   }
@@ -92,7 +110,13 @@ export default function LogForm({ day, onFinished }) {
     );
   }
   return (
-    <div className="log-form">
+    <div
+      className={
+        "log-form" + (rest.endsAt !== null ? " log-form--resting" : "")
+      }
+    >
+      <RestSettings seconds={rest.seconds} onChange={rest.changeSeconds} />
+
       {exerciseIds.map((id) => {
         const previous = getPreviousSets(sessions, id);
         return (
@@ -106,6 +130,7 @@ export default function LogForm({ day, onFinished }) {
               <span>Previous</span>
               <span>Weight ({unit})</span>
               <span>Reps</span>
+              <span />
               <span />
             </div>
 
@@ -137,6 +162,19 @@ export default function LogForm({ day, onFinished }) {
                   onChange={(e) => updateSet(id, i, "reps", e.target.value)}
                   aria-label={`Set ${i + 1} reps`}
                 />
+                <button
+                  type="button"
+                  className={
+                    "log-form__check" +
+                    (set.done ? " log-form__check--done" : "")
+                  }
+                  onClick={() => toggleDone(id, i)}
+                  disabled={!set.done && !isFilled(set)}
+                  aria-pressed={set.done}
+                  aria-label={`Set ${i + 1} done, start rest timer`}
+                >
+                  ✓
+                </button>
                 {sets[id].length > 2 ? (
                   <button
                     type="button"
@@ -171,6 +209,17 @@ export default function LogForm({ day, onFinished }) {
       >
         Finish session
       </button>
+
+      {rest.endsAt !== null && (
+        <RestBar
+          key={rest.startedAt}
+          startedAt={rest.startedAt}
+          endsAt={rest.endsAt}
+          mode={rest.mode}
+          onShift={rest.shift}
+          onSkip={rest.skip}
+        />
+      )}
     </div>
   );
 }

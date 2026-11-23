@@ -5,6 +5,7 @@ export const KEYS = {
   unit: "prchive-unit",
   exercises: "prchive-exercises",
   subscription: "prchive-subscription",
+  restTimer: "prchive-rest-timer",
 };
 
 export function load(key, fallback = null) {
