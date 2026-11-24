@@ -8,9 +8,11 @@ A gym tracker for lifters who want to see whether they are actually getting stro
 
 - **Weekly split.** Seven day cards with a name and a list of exercises per day. Open a day to see its exercises, or switch to edit mode to rename days and add or remove exercises.
 - **Log a session.** Pick the day, and the exercises are preloaded from your split. Each set has weight and reps, and a "Previous" column shows what you lifted last time.
+- **Unilateral option.** If you are doing exercise separately with each hand, choose unilateral option when editing split, logging that exercise now gives you left and right options.
 - **Progress charts.** Pick an exercise and see the top set of every session on a line chart, with your current set, the change since your first session and your personal record.
 - **Subscription reminders.** Enter your renewal date, see the days left, and choose reminders for 7, 3 and 1 day before. A popup shows up when you open the app inside a reminder window.
 - **kg / lb switch.** One setting for the whole app. Weights are always stored in kg, so switching units never changes your history.
+- **Rest timer.** Choose how many minutes do you want to rest between sets and timer will start when you click checkmark after logging a set.
 - **Dark and light themes**, remembered between visits.
 - **Responsive layout** that works on desktop and on phones.
 
