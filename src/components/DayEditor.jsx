@@ -11,18 +11,22 @@ export default function DayEditor({ day }) {
     renameDay,
     addExerciseToDay,
     removeExerciseFromDay,
+    setExerciseUnilateral,
   } = useAppData();
   const [draft, setDraft] = useState("");
 
   const { name, exerciseIds } = split[day];
   const nameById = Object.fromEntries(exercises.map((ex) => [ex.id, ex.name]));
+  const unilateralById = Object.fromEntries(
+    exercises.map((ex) => [ex.id, !!ex.unilateral]),
+  );
 
   function handleAdd(e) {
     e.preventDefault();
     const typed = draft.trim();
     if (!typed) return;
 
-    const existing = exerciseIds.find(
+    const existing = exercises.find(
       (ex) => ex.name?.toLowerCase() === typed.toLowerCase(),
     );
     const exercise = existing ?? addExercise(typed);
@@ -53,6 +57,14 @@ export default function DayEditor({ day }) {
           {exerciseIds.map((id) => (
             <li key={id} className="day-editor__item">
               <span>{nameById[id] ?? "Unknown exercise"}</span>
+              <label className="day-editor__uni">
+                <input
+                  type="checkbox"
+                  checked={unilateralById[id] ?? false}
+                  onChange={(e) => setExerciseUnilateral(id, e.target.checked)}
+                />
+                Unilateral
+              </label>
               <button
                 type="button"
                 className="day-editor__remove"
