@@ -10,13 +10,34 @@ export function topSet(sets) {
   return best;
 }
 
-export function getHistory(sessions, exerciseId) {
+function flatSets(sets) {
+  return sets.flatMap((s) =>
+    s.left || s.right ? [s.left, s.right].filter(Boolean) : [s],
+  );
+}
+function sideSets(sets, side) {
+  return sets.map((s) => s[side]).filter(Boolean);
+}
+
+export function getHistory(sessions, exerciseId, side = null) {
   const points = [];
   for (const s of sessions) {
     const entry = s.entries.find((e) => e.exerciseId === exerciseId);
-    const best = entry ? topSet(entry.sets) : null;
-    if (best) points.push({ date: s.date, kg: best.kg, reps: best.reps });
+    const used = entry
+      ? side
+        ? sideSets(entry.sets, side)
+        : flatSets(entry.sets)
+      : [];
+    const best = topSet(used);
+    if (best)
+      points.push({
+        sessionId: s.id,
+        date: s.date,
+        kg: best.kg,
+        reps: best.reps,
+      });
   }
+
   return points.sort((a, b) =>
     a.date < b.date ? -1 : a.date > b.date ? 1 : 0,
   );

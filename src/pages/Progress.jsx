@@ -26,6 +26,21 @@ const longDate = (iso) =>
     year: "numeric",
   });
 
+function mergeSides(left, right) {
+  const bySession = new Map();
+  for (const h of left) bySession.set(h.sessionId, { date: h.date, left: h });
+  for (const h of right) {
+    bySession.set(h.sessionId, {
+      ...bySession.get(h.sessionId),
+      date: h.date,
+      right: h,
+    });
+  }
+  return [...bySession.values()].sort((a, b) =>
+    a.date < b.date ? -1 : a.date > b.date ? 1 : 0,
+  );
+}
+
 export default function Progress() {
   const { exerciseId } = useParams();
   const { exercises, sessions, unit } = useAppData();
@@ -44,12 +59,29 @@ export default function Progress() {
   const history = selected ? getHistory(sessions, selected.id) : [];
   const stats = getStats(history);
 
-  const data = history.map((h) => ({
-    label: shortDate(h.date),
-    fullDate: longDate(h.date),
-    weight: kgToDisplay(h.kg, unit),
-    reps: h.reps,
-  }));
+  const sidedPoints = selected?.unilateral
+    ? mergeSides(
+        getHistory(sessions, selected.id, "left"),
+        getHistory(sessions, selected.id, "right"),
+      )
+    : [];
+  const sided = sidedPoints.length > 0;
+
+  const data = sided
+    ? sidedPoints.map((p) => ({
+        label: shortDate(p.date),
+        fullDate: longDate(p.date),
+        left: p.left ? kgToDisplay(p.left.kg, unit) : null,
+        leftReps: p.left?.reps,
+        right: p.right ? kgToDisplay(p.right.kg, unit) : null,
+        rightReps: p.right?.reps,
+      }))
+    : history.map((h) => ({
+        label: shortDate(h.date),
+        fullDate: longDate(h.date),
+        weight: kgToDisplay(h.kg, unit),
+        reps: h.reps,
+      }));
   const fmt = (set) => `${kgToDisplay(set.kg, unit)} ${unit} × ${set.reps}`;
   const change = stats ? kgToDisplay(stats.changeKg, unit) : 0;
 
@@ -112,7 +144,7 @@ export default function Progress() {
             />
           </div>
 
-          <StrengthChart data={data} unit={unit} />
+          <StrengthChart data={data} unit={unit} sided={sided} />
 
           {stats.sessionCount < 2 && (
             <p className="progress__hint">

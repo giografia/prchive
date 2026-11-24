@@ -24,6 +24,16 @@ function reducer(state, action) {
     case "exercise/added":
       return { ...state, exercises: [...state.exercises, action.exercise] };
 
+    case "exercise/unilateralSet":
+      return {
+        ...state,
+        exercises: state.exercises.map((ex) =>
+          ex.id === action.exerciseId
+            ? { ...ex, unilateral: action.unilateral }
+            : ex,
+        ),
+      };
+
     case "day/renamed":
       return {
         ...state,
@@ -133,6 +143,8 @@ export default function AppDataProvider({ children }) {
     unit: state.unit,
     setUnit: (unit) => dispatch({ type: "unit/set", unit }),
     addExercise,
+    setExerciseUnilateral: (exerciseId, unilateral) =>
+      dispatch({ type: "exercise/unilateralSet", exerciseId, unilateral }),
     renameDay: (day, name) => dispatch({ type: "day/renamed", day, name }),
     addExerciseToDay: (day, exerciseId) =>
       dispatch({ type: "day/exerciseAdded", day, exerciseId }),

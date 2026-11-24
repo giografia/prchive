@@ -207,7 +207,7 @@
     transform: none;
   }
 }
-/* Phones: the row now has two buttons, so give the numbers more room */
+/*phones: the row now has two buttons, so give the numbers more room */
 @media (max-width: 640px) {
   .log-form__exercise {
     padding: 16px 12px;
@@ -215,9 +215,62 @@
 
   .log-form__row {
     gap: 4px;
-    grid-template-columns: 24px minmax(0, 1.15fr) minmax(0, 1fr) minmax(
-        0,
-        0.85fr
-      ) 32px 32px;
+    grid-template-columns:
+      24px minmax(0, 1.15fr) minmax(0, 1fr) minmax(0, 0.85fr)
+      32px 32px;
+  }
+}
+
+/*unilateral exercises: each set is a Left row and a Right row */
+.log-form__set {
+  margin-bottom: 12px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--line);
+}
+
+.log-form__row--sided {
+  grid-template-columns:
+    24px 22px minmax(0, 1.1fr) minmax(0, 1fr) minmax(0, 0.8fr)
+    32px 32px;
+}
+
+.log-form__side {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--accent-text);
+  text-align: center;
+}
+
+.log-form__copy {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: none;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: var(--muted);
+  font: inherit;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+@media (hover: hover) {
+  .log-form__copy:hover {
+    border-color: var(--accent-text);
+    color: var(--accent-text);
+  }
+}
+
+@media (max-width: 640px) {
+  .log-form__row--sided {
+    gap: 4px;
+    grid-template-columns:
+      20px 18px minmax(0, 1.15fr) minmax(0, 1fr) minmax(0, 0.85fr)
+      32px 32px;
   }
 }

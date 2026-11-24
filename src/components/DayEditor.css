@@ -100,3 +100,17 @@
   font-weight: 600;
   cursor: pointer;
 }
+.day-editor__uni {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.day-editor__uni input {
+  accent-color: var(--accent);
+  cursor: pointer;
+}
