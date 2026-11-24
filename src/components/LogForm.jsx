@@ -15,17 +15,18 @@ import "./LogForm.css";
 const DEFAULT_ROWS = 2;
 const SIDES = ["left", "right"];
 
-const emptySide = () => ({ weight: "", reps: "", weightUnit: null });
+const emptySide = () => ({
+  weight: "",
+  reps: "",
+  weightUnit: null,
+  done: false,
+});
 
 const emptySet = (unilateral) =>
-  unilateral
-    ? { left: emptySide(), right: emptySide(), done: false }
-    : { ...emptySide(), done: false };
+  unilateral ? { left: emptySide(), right: emptySide() } : emptySide();
 
-const sideFilled = (s) => parseFloat(s.weight) > 0 && parseInt(s.reps, 10) > 0;
-
-const isFilled = (set) =>
-  set.left ? sideFilled(set.left) || sideFilled(set.right) : sideFilled(set);
+const isFilled = (side) =>
+  parseFloat(side.weight) > 0 && parseInt(side.reps, 10) > 0;
 
 const isSided = (s) => Boolean(s && (s.left || s.right));
 
@@ -116,7 +117,7 @@ export default function LogForm({ day, onFinished }) {
     setSets((prev) => ({
       ...prev,
       [id]: prev[id].map((s, i) =>
-        i === index ? { ...s, right: { ...s.left } } : s,
+        i === index ? { ...s, right: { ...s.left, done: false } } : s,
       ),
     }));
   }
@@ -132,9 +133,11 @@ export default function LogForm({ day, onFinished }) {
       [id]: prev[id].filter((_, i) => i !== index),
     }));
   }
-  function toggleDone(id, index) {
-    const wasDone = sets[id][index].done;
-    updateSet(id, index, "done", !wasDone);
+  function toggleDone(id, index, side = null) {
+    const set = sets[id][index];
+    const target = side ? set[side] : set;
+    const wasDone = target.done;
+    updateSet(id, index, "done", !wasDone, side);
     if (!wasDone) rest.start();
   }
   const entries = buildEntries(exerciseIds, sets, unilateralById);
@@ -175,17 +178,19 @@ export default function LogForm({ day, onFinished }) {
     );
   }
 
-  function renderCheck(id, i, set) {
+  function renderCheck(id, i, set, side = null) {
+    const target = side ? set[side] : set;
+    const label = side ? `Set ${i + 1} ${side}` : `Set ${i + 1}`;
     return (
       <button
         type="button"
         className={
-          "log-form__check" + (set.done ? " log-form__check--done" : "")
+          "log-form__check" + (target.done ? " log-form__check--done" : "")
         }
-        onClick={() => toggleDone(id, i)}
-        disabled={!set.done && !isFilled(set)}
-        aria-pressed={set.done}
-        aria-label={`Set ${i + 1} done, start rest timer`}
+        onClick={() => toggleDone(id, i, side)}
+        disabled={!target.done && !isFilled(target)}
+        aria-pressed={target.done}
+        aria-label={`${label} done, start rest timer`}
       >
         ✓
       </button>
@@ -265,8 +270,9 @@ export default function LogForm({ day, onFinished }) {
                         {prevText(previous[i], side, unit)}
                       </span>
                       {renderInputs(id, i, set, side)}
+                      {renderCheck(id, i, set, side)}
                       {side === "left" ? (
-                        renderCheck(id, i, set)
+                        renderRemove(id, i)
                       ) : (
                         <button
                           type="button"
@@ -277,7 +283,6 @@ export default function LogForm({ day, onFinished }) {
                           L→R
                         </button>
                       )}
-                      {side === "left" ? renderRemove(id, i) : <span />}
                     </div>
                   ))}
                 </div>
