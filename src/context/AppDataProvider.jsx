@@ -74,6 +74,31 @@ function reducer(state, action) {
       };
     }
 
+    case "day/exerciseMoved": {
+      const current = state.split[action.day];
+      const from = current.exerciseIds.indexOf(action.exerciseId);
+      const to = from + action.direction;
+      if (from === -1 || to < 0 || to >= current.exerciseIds.length)
+        return state;
+      const ids = [...current.exerciseIds];
+      [ids[from], ids[to]] = [ids[to], ids[from]];
+      return {
+        ...state,
+        split: {
+          ...state.split,
+          [action.day]: { ...current, exerciseIds: ids },
+        },
+      };
+    }
+
+    case "exercise/renamed":
+      return {
+        ...state,
+        exercises: state.exercises.map((ex) =>
+          ex.id === action.exerciseId ? { ...ex, name: action.name } : ex,
+        ),
+      };
+
     case "session/added":
       return { ...state, sessions: [...state.sessions, action.session] };
 
@@ -135,6 +160,18 @@ export default function AppDataProvider({ children }) {
       session: { id: crypto.randomUUID(), ...session },
     });
   }
+  function renameExercise(exerciseId, name) {
+    const trimmed = name.trim();
+    if (!trimmed) return "Name can't be empty.";
+    const clash = state.exercises.some(
+      (ex) =>
+        ex.id !== exerciseId &&
+        ex.name?.toLowerCase() === trimmed.toLowerCase(),
+    );
+    if (clash) return "You already have an exercise with that name.";
+    dispatch({ type: "exercise/renamed", exerciseId, name: trimmed });
+    return null;
+  }
 
   const value = {
     exercises: state.exercises,
@@ -150,6 +187,9 @@ export default function AppDataProvider({ children }) {
       dispatch({ type: "day/exerciseAdded", day, exerciseId }),
     removeExerciseFromDay: (day, exerciseId) =>
       dispatch({ type: "day/exerciseRemoved", day, exerciseId }),
+    moveExerciseInDay: (day, exerciseId, direction) =>
+      dispatch({ type: "day/exerciseMoved", day, exerciseId, direction }),
+    renameExercise,
     addSession,
     subscription: state.subscription,
     setRenewalDate: (date) => dispatch({ type: "subscription/dateSet", date }),
