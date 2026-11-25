@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useAppData } from "../context/useAppData";
 import { DAY_LABELS } from "../data/split";
+import ExerciseRow from "./ExerciseRow";
 import "./DayEditor.css";
 
 export default function DayEditor({ day }) {
@@ -12,6 +13,8 @@ export default function DayEditor({ day }) {
     addExerciseToDay,
     removeExerciseFromDay,
     setExerciseUnilateral,
+    moveExerciseInDay,
+    renameExercise,
   } = useAppData();
   const [draft, setDraft] = useState("");
 
@@ -54,26 +57,18 @@ export default function DayEditor({ day }) {
         </p>
       ) : (
         <ul className="day-editor__list">
-          {exerciseIds.map((id) => (
-            <li key={id} className="day-editor__item">
-              <span>{nameById[id] ?? "Unknown exercise"}</span>
-              <label className="day-editor__uni">
-                <input
-                  type="checkbox"
-                  checked={unilateralById[id] ?? false}
-                  onChange={(e) => setExerciseUnilateral(id, e.target.checked)}
-                />
-                Unilateral
-              </label>
-              <button
-                type="button"
-                className="day-editor__remove"
-                onClick={() => removeExerciseFromDay(day, id)}
-                aria-label={`Remove ${nameById[id] ?? "exercise"}`}
-              >
-                ✕
-              </button>
-            </li>
+          {exerciseIds.map((id, index) => (
+            <ExerciseRow
+              key={id}
+              name={nameById[id] ?? "Unknown exercise"}
+              isFirst={index === 0}
+              isLast={index === exerciseIds.length - 1}
+              unilateral={unilateralById[id] ?? false}
+              onMove={(direction) => moveExerciseInDay(day, id, direction)}
+              onRename={(newName) => renameExercise(id, newName)}
+              onToggleUnilateral={(value) => setExerciseUnilateral(id, value)}
+              onRemove={() => removeExerciseFromDay(day, id)}
+            />
           ))}
         </ul>
       )}

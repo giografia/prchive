@@ -1,0 +1,80 @@
+.day-editor__item.exercise-row {
+  flex-wrap: wrap;
+}
+
+.exercise-row__main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex: 1 1 100%;
+  min-width: 0;
+}
+
+.exercise-row__name {
+  overflow-wrap: anywhere;
+}
+
+.exercise-row__controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1 1 100%;
+}
+
+.exercise-row__form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.exercise-row__input {
+  flex: 1;
+  min-width: 0;
+  padding: 6px 10px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--text);
+  font: inherit;
+}
+
+.exercise-row__input:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.exercise-row__btn {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: none;
+  color: var(--muted);
+  font-size: 16px;
+  cursor: pointer;
+  transition:
+    transform 0.2s,
+    color 0.2s,
+    border-color 0.2s;
+}
+
+.exercise-row__btn:hover:not(:disabled) {
+  color: var(--accent-text);
+  border-color: var(--accent-text);
+  transform: translateY(-1px);
+}
+
+.exercise-row__btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.exercise-row__error {
+  flex: 1 1 100%;
+  margin: 0;
+  color: var(--accent-2);
+  font-size: 13px;
+}
