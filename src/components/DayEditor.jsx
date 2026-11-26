@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useAppData } from "../context/useAppData";
 import { DAY_LABELS } from "../data/split";
 import ExerciseRow from "./ExerciseRow";
+import useFlipList from "../utils/useFlipList";
 import "./DayEditor.css";
 
 export default function DayEditor({ day }) {
@@ -17,6 +18,8 @@ export default function DayEditor({ day }) {
     renameExercise,
   } = useAppData();
   const [draft, setDraft] = useState("");
+  const listRef = useRef(null);
+  useFlipList(listRef);
 
   const { name, exerciseIds } = split[day];
   const nameById = Object.fromEntries(exercises.map((ex) => [ex.id, ex.name]));
@@ -56,10 +59,11 @@ export default function DayEditor({ day }) {
           No exercises, this is a rest day. Make sure to eat enough protein!
         </p>
       ) : (
-        <ul className="day-editor__list">
+        <ul className="day-editor__list" ref={listRef}>
           {exerciseIds.map((id, index) => (
             <ExerciseRow
               key={id}
+              id={id}
               name={nameById[id] ?? "Unknown exercise"}
               isFirst={index === 0}
               isLast={index === exerciseIds.length - 1}

@@ -2,6 +2,7 @@ import { useState } from "react";
 import "./ExerciseRow.css";
 
 export default function ExerciseRow({
+  id,
   name,
   isFirst,
   isLast,
@@ -33,7 +34,7 @@ export default function ExerciseRow({
   }
 
   return (
-    <li className="day-editor__item exercise-row">
+    <li className="day-editor__item exercise-row" data-flip-key={id}>
       <div className="exercise-row__main">
         {editing ? (
           <form className="exercise-row__form" onSubmit={handleSubmit}>
