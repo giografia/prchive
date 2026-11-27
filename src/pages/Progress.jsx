@@ -41,28 +41,64 @@ function mergeSides(left, right) {
   );
 }
 
+const normalize = (name) =>
+  (name ?? "").trim().toLowerCase().replace(/\s+/g, " ");
+
 export default function Progress() {
   const { exerciseId } = useParams();
-  const { exercises, sessions, unit } = useAppData();
+  const { exercises, sessions, unit, split } = useAppData();
 
-  const logged = exercises.filter(
-    (ex) => getHistory(sessions, ex.id).length > 0,
+  //ids of every exercise that is in at least one day of the split
+  const inSplit = new Set(
+    Object.values(split).flatMap((day) => day.exerciseIds),
   );
-  if (exerciseId && !logged.some((ex) => ex.id === exerciseId)) {
+
+  //one group per name (ignoring case and extra spaces)
+  const groups = [];
+  const byKey = new Map();
+  for (const ex of exercises) {
+    const key = normalize(ex.name);
+    if (!key) continue;
+    let group = byKey.get(key);
+    if (!group) {
+      group = {
+        name: ex.name,
+        ids: [],
+        linkId: null,
+        unilateral: false,
+        active: false,
+      };
+      byKey.set(key, group);
+      groups.push(group);
+    }
+    group.ids.push(ex.id);
+    if (inSplit.has(ex.id)) {
+      if (!group.active) group.name = ex.name;
+      group.active = true;
+      group.linkId ??= ex.id;
+      group.unilateral = group.unilateral || !!ex.unilateral;
+    }
+  }
+
+  //only exercises in the split that have logged sets
+  const visible = groups.filter(
+    (g) => g.active && getHistory(sessions, g.ids).length > 0,
+  );
+
+  if (exerciseId && !visible.some((g) => g.ids.includes(exerciseId))) {
     return <Navigate to="/progress" replace />;
   }
+  const preferredId = exerciseId ?? getLastLoggedExerciseId(sessions);
   const selected =
-    logged.find(
-      (ex) => ex.id === (exerciseId ?? getLastLoggedExerciseId(sessions)),
-    ) ?? logged[0];
+    visible.find((g) => g.ids.includes(preferredId)) ?? visible[0];
 
-  const history = selected ? getHistory(sessions, selected.id) : [];
+  const history = selected ? getHistory(sessions, selected.ids) : [];
   const stats = getStats(history);
 
   const sidedPoints = selected?.unilateral
     ? mergeSides(
-        getHistory(sessions, selected.id, "left"),
-        getHistory(sessions, selected.id, "right"),
+        getHistory(sessions, selected.ids, "left"),
+        getHistory(sessions, selected.ids, "right"),
       )
     : [];
   const sided = sidedPoints.length > 0;
@@ -107,16 +143,14 @@ export default function Progress() {
             role="group"
             aria-label="Choose exercise"
           >
-            {logged.map((ex) => (
+            {visible.map((g) => (
               <Link
-                key={ex.id}
-                to={`/progress/${ex.id}`}
-                className={
-                  "progress__chip" + (ex.id === selected.id ? " active" : "")
-                }
-                aria-current={ex.id === selected.id ? "page" : undefined}
+                key={g.linkId}
+                to={`/progress/${g.linkId}`}
+                className={"progress__chip" + (g === selected ? " active" : "")}
+                aria-current={g === selected ? "page" : undefined}
               >
-                {ex.name}
+                {g.name}
               </Link>
             ))}
           </div>

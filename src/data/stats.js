@@ -19,15 +19,13 @@ function sideSets(sets, side) {
   return sets.map((s) => s[side]).filter(Boolean);
 }
 
-export function getHistory(sessions, exerciseId, side = null) {
+export function getHistory(sessions, exerciseIds, side = null) {
+  const ids = Array.isArray(exerciseIds) ? exerciseIds : [exerciseIds];
   const points = [];
   for (const s of sessions) {
-    const entry = s.entries.find((e) => e.exerciseId === exerciseId);
-    const used = entry
-      ? side
-        ? sideSets(entry.sets, side)
-        : flatSets(entry.sets)
-      : [];
+    const used = s.entries
+      .filter((e) => ids.includes(e.exerciseId))
+      .flatMap((e) => (side ? sideSets(e.sets, side) : flatSets(e.sets)));
     const best = topSet(used);
     if (best)
       points.push({
