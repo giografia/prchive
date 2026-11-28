@@ -25,7 +25,10 @@ export function getHistory(sessions, exerciseIds, side = null) {
   for (const s of sessions) {
     const used = s.entries
       .filter((e) => ids.includes(e.exerciseId))
-      .flatMap((e) => (side ? sideSets(e.sets, side) : flatSets(e.sets)));
+      .flatMap((e) => {
+        const working = e.sets.filter((set) => !set.warmup);
+        return side ? sideSets(working, side) : flatSets(working);
+      });
     const best = topSet(used);
     if (best)
       points.push({

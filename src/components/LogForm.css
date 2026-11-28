@@ -1,8 +1,18 @@
 .log-form {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(400px, 100%), 1fr));
+  grid-template-columns: minmax(0, 1fr);
   align-items: start;
   gap: 16px;
+}
+
+.log-form__cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(400px, 100%), 1fr));
+  grid-auto-rows: 1px;
+  grid-auto-flow: row dense;
+  column-gap: 16px;
+  align-items: start;
+  margin-bottom: -16px; /*cancels the extra gap after the last card */
 }
 .log-form--resting {
   padding-bottom: 110px;
@@ -273,4 +283,28 @@
       20px 18px minmax(0, 1.15fr) minmax(0, 1fr) minmax(0, 0.85fr)
       32px 32px;
   }
+}
+
+/*warmup sets: tap the set number to toggle */
+.log-form__num--warmup {
+  color: var(--accent-text);
+}
+
+.log-form__row--warmup input {
+  border-style: dashed;
+  opacity: 0.75;
+}
+
+.log-form__prev--warmup {
+  font-style: italic;
+}
+/*warmup: remove the old tap-the-number rules (.log-form__num--btn) */
+.log-form__actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.log-form__actions .log-form__add {
+  margin-top: 0;
 }
