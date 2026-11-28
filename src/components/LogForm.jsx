@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Link } from "react-router";
 import { useAppData } from "../context/useAppData";
 import { useRestTimer } from "../hooks/useRestTimer";
 import RestBar from "./RestBar";
 import RestSettings from "./RestSettings";
+import { useGrid } from "../hooks/useGrid";
 import {
   displayToKg,
   getPreviousSets,
@@ -23,7 +24,9 @@ const emptySide = () => ({
 });
 
 const emptySet = (unilateral) =>
-  unilateral ? { left: emptySide(), right: emptySide() } : emptySide();
+  unilateral
+    ? { left: emptySide(), right: emptySide(), warmup: false }
+    : { ...emptySide(), warmup: false };
 
 const isFilled = (side) =>
   parseFloat(side.weight) > 0 && parseInt(side.reps, 10) > 0;
@@ -66,17 +69,27 @@ function buildEntries(exerciseIds, sets, unilateralById) {
       exerciseId,
       sets: sets[exerciseId]
         .map((set) => {
+          const warm = set.warmup ? { warmup: true } : {};
           if (unilateralById[exerciseId]) {
             const left = toSaved(set.left);
             const right = toSaved(set.right);
             if (!left && !right) return null;
-            return { ...(left && { left }), ...(right && { right }) };
+            return { ...(left && { left }), ...(right && { right }), ...warm };
           }
-          return toSaved(set);
+          const saved = toSaved(set);
+          return saved && { ...saved, ...warm };
         })
         .filter(Boolean),
     }))
     .filter((entry) => entry.sets.length > 0);
+}
+
+// Matches a row with the same kind of set from last time
+// (warmup with warmup, working set with working set).
+function prevFor(previous, rows, i) {
+  const warm = !!rows[i].warmup;
+  const k = rows.slice(0, i).filter((r) => !!r.warmup === warm).length;
+  return previous.filter((p) => !!p.warmup === warm)[k];
 }
 
 export default function LogForm({ day, onFinished }) {
@@ -87,11 +100,15 @@ export default function LogForm({ day, onFinished }) {
     exercises.map((ex) => [ex.id, !!ex.unilateral]),
   );
   const rest = useRestTimer();
+  const gridRef = useRef(null);
+  useGrid(gridRef, day);
 
   const [sets, setSets] = useState(() =>
     Object.fromEntries(
       exerciseIds.map((id) => {
-        const count = getPreviousSets(sessions, id).length || DEFAULT_ROWS;
+        const count =
+          getPreviousSets(sessions, id).filter((s) => !s.warmup).length ||
+          DEFAULT_ROWS;
         return [
           id,
           Array.from({ length: count }, () => emptySet(unilateralById[id])),
@@ -127,6 +144,15 @@ export default function LogForm({ day, onFinished }) {
       [id]: [...prev[id], emptySet(unilateralById[id])],
     }));
   }
+  function addWarmup(id) {
+    setSets((prev) => {
+      const rows = prev[id];
+      let at = 0;
+      while (at < rows.length && rows[at].warmup) at++;
+      const row = { ...emptySet(unilateralById[id]), warmup: true };
+      return { ...prev, [id]: [...rows.slice(0, at), row, ...rows.slice(at)] };
+    });
+  }
   function removeSet(id, index) {
     setSets((prev) => ({
       ...prev,
@@ -138,7 +164,7 @@ export default function LogForm({ day, onFinished }) {
     const target = side ? set[side] : set;
     const wasDone = target.done;
     updateSet(id, index, "done", !wasDone, side);
-    if (!wasDone) rest.start();
+    if (!wasDone && !set.warmup) rest.start();
   }
   const entries = buildEntries(exerciseIds, sets, unilateralById);
 
@@ -197,8 +223,16 @@ export default function LogForm({ day, onFinished }) {
     );
   }
 
+  function renderNum(id, i, set) {
+    if (set.warmup) {
+      return <span className="log-form__num log-form__num--warmup">W</span>;
+    }
+    const number = sets[id].slice(0, i).filter((s) => !s.warmup).length + 1;
+    return <span className="log-form__num">{number}</span>;
+  }
+
   function renderRemove(id, i) {
-    return sets[id].length > 2 ? (
+    return sets[id].length > 2 || sets[id][i].warmup ? (
       <button
         type="button"
         className="log-form__remove"
@@ -228,87 +262,115 @@ export default function LogForm({ day, onFinished }) {
     >
       <RestSettings seconds={rest.seconds} onChange={rest.changeSeconds} />
 
-      {exerciseIds.map((id) => {
-        const previous = getPreviousSets(sessions, id);
-        const uni = unilateralById[id];
-        return (
-          <section key={id} className="log-form__exercise">
-            <h2 className="log-form__name">
-              {nameById[id] ?? "Unknown exercise"}
-            </h2>
+      <div className="log-form__cards" ref={gridRef}>
+        {exerciseIds.map((id) => {
+          const previous = getPreviousSets(sessions, id);
+          const uni = unilateralById[id];
+          return (
+            <section key={id} className="log-form__exercise">
+              <h2 className="log-form__name">
+                {nameById[id] ?? "Unknown exercise"}
+              </h2>
 
-            <div
-              className={
-                "log-form__row log-form__row--head" +
-                (uni ? " log-form__row--sided" : "")
-              }
-            >
-              <span>Set</span>
-              {uni && <span>Side</span>}
-              <span>Previous</span>
-              <span>Weight ({unit})</span>
-              <span>Reps</span>
-              <span />
-              <span />
-            </div>
+              <div
+                className={
+                  "log-form__row log-form__row--head" +
+                  (uni ? " log-form__row--sided" : "")
+                }
+              >
+                <span>Set</span>
+                {uni && <span>Side</span>}
+                <span>Previous</span>
+                <span>Weight ({unit})</span>
+                <span>Reps</span>
+                <span />
+                <span />
+              </div>
 
-            {sets[id].map((set, i) =>
-              uni ? (
-                <div key={i} className="log-form__set">
-                  {SIDES.map((side) => (
-                    <div
-                      key={side}
-                      className="log-form__row log-form__row--sided"
-                    >
-                      <span className="log-form__num">
-                        {side === "left" ? i + 1 : ""}
-                      </span>
-                      <span className="log-form__side">
-                        {side === "left" ? "L" : "R"}
-                      </span>
-                      <span className="log-form__prev">
-                        {prevText(previous[i], side, unit)}
-                      </span>
-                      {renderInputs(id, i, set, side)}
-                      {renderCheck(id, i, set, side)}
-                      {side === "left" ? (
-                        renderRemove(id, i)
-                      ) : (
-                        <button
-                          type="button"
-                          className="log-form__copy"
-                          onClick={() => copyLeftToRight(id, i)}
-                          aria-label={`Set ${i + 1} copy left to right`}
+              {sets[id].map((set, i) =>
+                uni ? (
+                  <div key={i} className="log-form__set">
+                    {SIDES.map((side) => (
+                      <div
+                        key={side}
+                        className={
+                          "log-form__row log-form__row--sided" +
+                          (set.warmup ? " log-form__row--warmup" : "")
+                        }
+                      >
+                        {side === "left" ? renderNum(id, i, set) : <span />}
+                        <span className="log-form__side">
+                          {side === "left" ? "L" : "R"}
+                        </span>
+                        <span
+                          className={
+                            "log-form__prev" +
+                            (set.warmup ? " log-form__prev--warmup" : "")
+                          }
                         >
-                          L→R
-                        </button>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div key={i} className="log-form__row">
-                  <span className="log-form__num">{i + 1}</span>
-                  <span className="log-form__prev">
-                    {prevText(previous[i], null, unit)}
-                  </span>
-                  {renderInputs(id, i, set, null)}
-                  {renderCheck(id, i, set)}
-                  {renderRemove(id, i)}
-                </div>
-              ),
-            )}
+                          {prevText(prevFor(previous, sets[id], i), side, unit)}
+                        </span>
+                        {renderInputs(id, i, set, side)}
+                        {renderCheck(id, i, set, side)}
+                        {side === "left" ? (
+                          renderRemove(id, i)
+                        ) : (
+                          <button
+                            type="button"
+                            className="log-form__copy"
+                            onClick={() => copyLeftToRight(id, i)}
+                            aria-label={`Set ${i + 1} copy left to right`}
+                          >
+                            L→R
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div
+                    key={i}
+                    className={
+                      "log-form__row" +
+                      (set.warmup ? " log-form__row--warmup" : "")
+                    }
+                  >
+                    {renderNum(id, i, set)}
+                    <span
+                      className={
+                        "log-form__prev" +
+                        (set.warmup ? " log-form__prev--warmup" : "")
+                      }
+                    >
+                      {prevText(prevFor(previous, sets[id], i), null, unit)}
+                    </span>
+                    {renderInputs(id, i, set, null)}
+                    {renderCheck(id, i, set)}
+                    {renderRemove(id, i)}
+                  </div>
+                ),
+              )}
 
-            <button
-              type="button"
-              className="log-form__add"
-              onClick={() => addSet(id)}
-            >
-              + Add set
-            </button>
-          </section>
-        );
-      })}
+              <div className="log-form__actions">
+                <button
+                  type="button"
+                  className="log-form__add"
+                  onClick={() => addSet(id)}
+                >
+                  + Add set
+                </button>
+                <button
+                  type="button"
+                  className="log-form__add"
+                  onClick={() => addWarmup(id)}
+                >
+                  + Warmup
+                </button>
+              </div>
+            </section>
+          );
+        })}
+      </div>
 
       <button
         type="button"
